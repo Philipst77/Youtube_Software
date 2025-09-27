@@ -63,11 +63,13 @@ Instead of running commands every time, you can create a clickable app with Auto
 If you want the transcript directly embedded into your downloaded video (hardcoded captions):
 
 # Example with ffmpeg + .srt subtitles
-ffmpeg -i "input.mp4" -vf "subtitles=subtitles.srt" -c:a copy "output_with_subs.mp4"
-
-.vtt subtitles → convert to .srt first:
+Frist: .vtt subtitles → convert to .srt 
 
 ffmpeg -i subtitles.vtt subtitles.srt
+
+
+ffmpeg -i "input.mp4" -vf "subtitles=subtitles.srt" -c:a copy "output_with_subs.mp4"
+
 
 ---
 
