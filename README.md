@@ -18,7 +18,7 @@ This project runs locally (no external backend required) and launches a lightwei
 ## 📦 Setup Instructions
 
 ### 1. Clone the Repo
-git clone https://github.com/yourusername/Youtube_Video_Downloader.git
+git clone [https://github.com/yourusername/Youtube_Video_Downloader](https://github.com/Philipst77/Youtube_Software.git)
 cd Youtube_Video_Downloader
 
 ### 2. Install Dependencies
