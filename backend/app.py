@@ -1,7 +1,10 @@
-import os, tempfile, shutil
+import os
+import tempfile
+import shutil
 from flask import Flask, request, jsonify
 from faster_whisper import WhisperModel
 import yt_dlp
+from deep_translator import GoogleTranslator
 
 # Model choice: "small", "medium", "large-v3" (bigger = slower, more accurate)
 MODEL_SIZE = os.getenv("WHISPER_MODEL", "small")
@@ -69,6 +72,8 @@ def to_vtt(segments):
 @app.get("/api/transcribe")
 def transcribe():
     url = request.args.get("url", "").strip()
+    target_lang = request.args.get("target_lang", "en").strip().lower()  # default English
+
     if not url:
         return jsonify({"error": "Missing ?url"}), 400
 
@@ -77,24 +82,37 @@ def transcribe():
         audio_path = download_audio(url, workdir)
         segments_out = []
 
-        # Transcribe
-        segments, info = model.transcribe(audio_path, vad_filter=True)
+        # Transcribe in English
+        segments, info = model.transcribe(audio_path, language="en", vad_filter=True)
+
         for seg in segments:
+            text = seg.text.strip()
+
+            # Translate if needed
+            if target_lang != "en":
+                try:
+                    text = GoogleTranslator(source="en", target=target_lang).translate(text)
+                except Exception as te:
+                    print("Translation error:", te)
+
             segments_out.append({
                 "start": float(seg.start),
                 "end": float(seg.end),
-                "text": seg.text.strip(),
+                "text": text,
             })
 
         # Build caption files
         srt = to_srt(segments_out)
         vtt = to_vtt(segments_out)
+
         return jsonify({
             "segments": segments_out,
             "srt": srt,
             "vtt": vtt,
             "duration": float(info.duration) if getattr(info, 'duration', None) else None,
+            "language": target_lang,
         })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

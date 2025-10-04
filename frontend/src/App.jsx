@@ -33,6 +33,7 @@ export default function App() {
   const [vttText, setVttText] = useState("");
   const [srtText, setSrtText] = useState("");
   const [showSubs, setShowSubs] = useState(true);
+  const [lang, setLang] = useState("en"); // NEW: target language dropdown
 
   // Extract YouTube video ID from common URL formats
   function extractVideoId(link) {
@@ -86,7 +87,10 @@ export default function App() {
     setVideoId(id);
     setLoading(true);
     try {
-      const resp = await fetch(`/api/transcribe?url=${encodeURIComponent(url)}`);
+      // Send target language to backend
+      const resp = await fetch(
+        `/api/transcribe?url=${encodeURIComponent(url)}&target_lang=${lang}`
+      );
       if (!resp.ok) throw new Error("Transcription failed");
       const data = await resp.json();
       setSegments(data.segments || []);
@@ -111,6 +115,24 @@ export default function App() {
           onChange={(e) => setUrl(e.target.value)}
           style={{ width: "400px", marginRight: "10px" }}
         />
+
+        {/* NEW: Language dropdown */}
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          style={{ marginRight: "10px" }}
+        >
+          <option value="en">English</option>
+          <option value="bg">Bulgarian</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="it">Italian</option>
+          <option value="ru">Russian</option>
+          <option value="zh">Chinese</option>
+          {/* Add more language codes as needed */}
+        </select>
+
         <button type="submit" disabled={loading}>
           {loading ? "Generating..." : "Generate"}
         </button>
