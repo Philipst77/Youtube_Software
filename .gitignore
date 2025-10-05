@@ -1,9 +1,16 @@
-# Python ignores
+# Node / npm
+node_modules/
+Youtube_Software/frontend/node_modules/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.log
+.venv/
+venv/
+backend/.venv/
+Youtube_Software/backend/.venv/
 
 # Virtual environments
 .venv/
