@@ -1,0 +1,22 @@
+# Python ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environments
+.venv/
+venv/
+backend/.venv/
+Youtube_Software/backend/.venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
