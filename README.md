@@ -1,108 +1,155 @@
 # 🎬 YouTube Auto Subtitles
 
-A simple tool to automatically **download YouTube subtitles/transcripts** and generate `.srt` / `.vtt` caption files. It also provides an interface to quickly fetch subtitles and burn them directly into videos with FFmpeg if needed.  
+A lightweight tool to generate, preview, and download subtitles for YouTube videos and local media files. It automatically creates `.srt` and `.vtt` caption files, previews subtitles in sync with video playback, and optionally burns subtitles directly into videos using FFmpeg.
 
-This project runs locally (no external backend required) and launches a lightweight web interface at `http://localhost:5173`.
+The app runs **100% locally** and launches a web interface at:  
+👉 **http://localhost:5173**
 
 ---
 
 ## ✨ Features
-- 🎥 Input any YouTube video URL.  
-- ⬇️ Download subtitles in **.srt** or **.vtt** format.  
-- 📝 Sync subtitles with the original video timeline.  
-- 🔥 Optionally burn subtitles directly into videos with `ffmpeg`.  
-- 🖥️ Easy Mac launcher (`.app`) to start everything with a double-click.  
+
+- 🎥 Paste any YouTube video URL
+- 📁 Upload local video/audio files (`.mp4`, `.mov`, `.mkv`, `.mp3`, `.wav`)
+- 🧠 Automatic transcription using Whisper
+- 🌍 Optional subtitle translation
+- ⬇️ Download subtitles as `.srt` or `.vtt`
+- ▶️ Live subtitle preview synced to video playback
+- 🔥 Optional hard-burned subtitles with FFmpeg
+- 🐳 Dockerized — no local Python / Node / FFmpeg setup required
 
 ---
 
-## 📦 Setup Instructions
+## 🚀 Recommended: Run with Docker (One Command)
 
-### 1. Clone the Repo
-git clone https://github.com/Philipst77/Youtube_Software.git
-cd Youtube_Video_Downloader
+This is the **preferred and easiest** way to run the app.
 
-### 2. Install Dependencies
-Use Python + Node.js (depending on your implementation):
+### Requirements
+- Docker Desktop (Mac / Windows / Linux)
 
-# Python (transcription / subtitle handling)
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+### Run
+```bash
+docker compose up
+```
 
-# Frontend (local web app)
-npm install
+Then open:
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:5001
 
-### 3. Start the App
-Run manually in two steps:
-
-source .venv/bin/activate
-npm run dev
-
-Then open:  
-👉 http://localhost:5173
+That's it. **No Python. No Node. No FFmpeg installs.**
 
 ---
 
-## 🚀 macOS Launcher (Optional)
+## 📦 What Docker Does for You
 
-Instead of running commands every time, you can create a clickable app with Automator:
+- Packages Python, Node, FFmpeg, Whisper, dependencies
+- Uses prebuilt images from Docker Hub
+- Caches Whisper models to avoid re-downloads
+- Works identically on all operating systems
 
-1. Open Automator → New Document → Application.  
-2. Add action: Run Shell Script.  
-3. Paste this your shell Script then save.
+---
 
+## ⬇️ Downloadable Files
 
+After transcription, you can download:
 
-4. Save as `YouTubeSubtitles.app` (e.g., Desktop).  
-5. ✅ Now double-clicking the `.app` launches the server and opens the web interface automatically.  
+✅ `.srt` subtitle files (for video editors & players)  
+✅ `.vtt` subtitle files (for web players)
+
+Downloads are available directly from the web UI.
 
 ---
 
 ## 🔥 Burn Subtitles into Video (Optional)
 
-If you want the transcript directly embedded into your downloaded video (hardcoded captions):
-
-# Example with ffmpeg + .srt subtitles
-Frist: .vtt subtitles → convert to .srt 
-
+To permanently embed subtitles into a video:
+```bash
+# Convert .vtt → .srt (if needed)
 ffmpeg -i subtitles.vtt subtitles.srt
 
+# Burn subtitles into the video
+ffmpeg -i input.mp4 -vf "subtitles=subtitles.srt" -c:a copy output_with_subs.mp4
+```
 
-ffmpeg -i "input.mp4" -vf "subtitles=subtitles.srt" -c:a copy "output_with_subs.mp4"
+This creates a video with hardcoded captions.
 
+---
+
+## 🧪 Manual Setup (Optional / Development Only)
+
+⚠️ **Not recommended** unless you are developing the app
+
+### Requirements
+- Python 3.11+
+- Node.js
+- FFmpeg
+
+### Backend
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+### Frontend
+```bash
+npm install
+npm run dev
+```
+
+Open: 👉 **http://localhost:5173**
 
 ---
 
 ## 📂 Project Structure
-
-Youtube_Video_Downloader/  
-│── backend/           # Subtitle fetch + transcription (Python/yt-dlp/faster-whisper)  
-│── frontend/          # Web UI (npm dev server)  
-│── subtitles/         # Saved .srt / .vtt files  
-│── requirements.txt   # Python dependencies  
-│── package.json       # Node.js dependencies  
-│── launch_subtitles.sh # Optional shell launcher  
+```
+Youtube_Video_Transcriber/
+│── backend/            # Flask API + Whisper transcription
+│── frontend/           # Vite / React web UI
+│── docker-compose.yml
+│── README.md
+```
 
 ---
 
 ## 🛠️ Tech Stack
-- yt-dlp – YouTube video & subtitle extraction  
-- faster-whisper – Fast subtitle transcription  
-- FFmpeg – Burn subtitles into video  
-- Flask (backend) + Vite/React (frontend)  
-- Automator / shell scripts for macOS integration  
+
+- **yt-dlp** – YouTube audio extraction
+- **faster-whisper** – Fast, local transcription
+- **FFmpeg** – Audio extraction & subtitle burning
+- **Flask** – Backend API
+- **React + Vite** – Frontend UI
+- **Docker & Docker Compose** – Packaging & distribution
 
 ---
 
 ## ⚡ Example Workflow
-1. Paste a YouTube link → click Generate.  
-2. Download subtitles as `.srt` or `.vtt`.  
-3. (Optional) Burn them into your video with FFmpeg.  
-4. Done ✅ — you now have a synced transcripted video.  
+
+1. Paste a YouTube link or upload a video
+2. Click **Generate**
+3. Preview subtitles synced with the video
+4. Download `.srt` / `.vtt`
+5. (Optional) Burn subtitles into the video
+
+**Done** ✅
 
 ---
 
 ## 📌 Notes
-- This runs locally only — no data leaves your machine.  
-- You must have Node.js, Python 3.11+, and FFmpeg installed.  
-- macOS users can double-click the Automator `.app` for a one-click experience.  
+
+- All processing happens **locally**
+- No data is uploaded to external servers
+- Docker is the **recommended** way to run the app
+- Works on macOS, Windows, and Linux
+
+---
+
+## 🐳 Docker Images
+
+Prebuilt images are available on Docker Hub:
+
+- `philipst77/youtube_software:backend`
+- `philipst77/youtube_software:frontend`
+
+Used automatically by `docker-compose.yml`.
