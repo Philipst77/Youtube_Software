@@ -29,7 +29,9 @@ This is the **preferred and easiest** way to run the app.
 
 ### Run
 ```bash
+curl -O https://raw.githubusercontent.com/Philipst77/Youtube_Software/main/docker-compose.yml
 docker compose up
+
 ```
 
 Then open:
