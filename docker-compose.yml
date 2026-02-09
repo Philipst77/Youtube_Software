@@ -2,7 +2,7 @@
 
 services:
   backend:
-    build: ./backend
+    image: philipst77/youtube_software:backend
     ports:
       - "5001:5001"
     volumes:
@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    image: philipst77/youtube_software:frontend
     ports:
       - "5173:5173"
     depends_on:
