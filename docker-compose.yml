@@ -1,0 +1,23 @@
+
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - whisper-cache:/root/.cache
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_BASE=http://backend:5001
+    restart: unless-stopped
+
+volumes:
+  whisper-cache:

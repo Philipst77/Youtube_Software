@@ -25,17 +25,19 @@ export default function App() {
   const playerRef = useRef(null);
   const rafRef = useRef(null);
 
+  const [mode, setMode] = useState("youtube"); // "youtube" | "file"
+  const [file, setFile] = useState(null);
+
   const [url, setUrl] = useState("");
   const [videoId, setVideoId] = useState("");
-  const [segments, setSegments] = useState([]); // [{start, end, text}]
+  const [segments, setSegments] = useState([]);
   const [currentText, setCurrentText] = useState("");
   const [loading, setLoading] = useState(false);
   const [vttText, setVttText] = useState("");
   const [srtText, setSrtText] = useState("");
-  const [showSubs, setShowSubs] = useState(true);
-  const [lang, setLang] = useState("en"); // NEW: target language dropdown
+  const [lang, setLang] = useState("en");
 
-  // Extract YouTube video ID from common URL formats
+  // Extract YouTube video ID
   function extractVideoId(link) {
     try {
       const u = new URL(link);
@@ -49,12 +51,14 @@ export default function App() {
     }
   }
 
-  // Initialize YT player when apiReady & videoId
+  // Initialize YouTube player
   useEffect(() => {
-    if (!apiReady || !videoId) return;
+    if (!apiReady || !videoId || mode !== "youtube") return;
+
     if (playerRef.current) {
       playerRef.current.destroy?.();
     }
+
     playerRef.current = new window.YT.Player("player", {
       videoId,
       playerVars: { modestbranding: 1, rel: 0, playsinline: 1 },
@@ -73,10 +77,11 @@ export default function App() {
         },
       },
     });
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [apiReady, videoId, segments]);
 
-  async function handleTranscribe(e) {
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [apiReady, videoId, segments, mode]);
+
+  async function handleYouTubeSubmit(e) {
     e.preventDefault();
     const id = extractVideoId(url);
     if (!id) {
@@ -86,19 +91,53 @@ export default function App() {
 
     setVideoId(id);
     setLoading(true);
+
     try {
-      // Send target language to backend
       const resp = await fetch(
         `/api/transcribe?url=${encodeURIComponent(url)}&target_lang=${lang}`
       );
       if (!resp.ok) throw new Error("Transcription failed");
+
       const data = await resp.json();
       setSegments(data.segments || []);
       setVttText(data.vtt || "");
       setSrtText(data.srt || "");
     } catch (err) {
-      console.error(err);
-      alert("Error: " + err.message);
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFileSubmit(e) {
+    e.preventDefault();
+    if (!file) {
+      alert("Please select a file.");
+      return;
+    }
+
+    setLoading(true);
+    setVideoId("");
+    setCurrentText("");
+
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("target_lang", lang);
+
+      const resp = await fetch("/api/transcribe-file", {
+        method: "POST",
+        body: form,
+      });
+
+      if (!resp.ok) throw new Error("File transcription failed");
+
+      const data = await resp.json();
+      setSegments(data.segments || []);
+      setVttText(data.vtt || "");
+      setSrtText(data.srt || "");
+    } catch (err) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
@@ -107,16 +146,47 @@ export default function App() {
   return (
     <div style={{ padding: 20, color: "white", background: "#111", minHeight: "100vh" }}>
       <h1>YouTube Auto Subtitles</h1>
-      <form onSubmit={handleTranscribe}>
-        <input
-          type="text"
-          placeholder="Paste YouTube link..."
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          style={{ width: "400px", marginRight: "10px" }}
-        />
 
-        {/* NEW: Language dropdown */}
+      {/* Mode toggle */}
+      <div style={{ marginBottom: 10 }}>
+        <label>
+          <input
+            type="radio"
+            checked={mode === "youtube"}
+            onChange={() => setMode("youtube")}
+          />{" "}
+          YouTube
+        </label>{" "}
+        <label>
+          <input
+            type="radio"
+            checked={mode === "file"}
+            onChange={() => setMode("file")}
+          />{" "}
+          Upload File
+        </label>
+      </div>
+
+      <form onSubmit={mode === "youtube" ? handleYouTubeSubmit : handleFileSubmit}>
+        {mode === "youtube" && (
+          <input
+            type="text"
+            placeholder="Paste YouTube link..."
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            style={{ width: "400px", marginRight: "10px" }}
+          />
+        )}
+
+        {mode === "file" && (
+          <input
+            type="file"
+            accept=".mp4,.mov,.mkv,.mp3,.wav"
+            onChange={(e) => setFile(e.target.files[0])}
+            style={{ marginRight: "10px" }}
+          />
+        )}
+
         <select
           value={lang}
           onChange={(e) => setLang(e.target.value)}
@@ -130,7 +200,6 @@ export default function App() {
           <option value="it">Italian</option>
           <option value="ru">Russian</option>
           <option value="zh">Chinese</option>
-          {/* Add more language codes as needed */}
         </select>
 
         <button type="submit" disabled={loading}>
@@ -138,9 +207,11 @@ export default function App() {
         </button>
       </form>
 
-      <div id="player" style={{ marginTop: 20, width: "640px", height: "360px" }}></div>
+      {mode === "youtube" && (
+        <div id="player" style={{ marginTop: 20, width: "640px", height: "360px" }} />
+      )}
 
-      {showSubs && currentText && (
+      {currentText && (
         <div style={{ marginTop: 20, fontSize: "18px", background: "#222", padding: "10px" }}>
           {currentText}
         </div>
