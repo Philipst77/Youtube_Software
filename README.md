@@ -86,7 +86,34 @@ Access:
 The system runs entirely locally within Docker containers.
 
 ---
+---
+#  Permanent Subtitle Embedding (Hard Burn)
 
+You can permanently embed subtitles into an `.mp4` video using FFmpeg. Hard-burned subtitles become part of the video frames and cannot be disabled.
+
+## If You Have an `.srt` File
+```bash
+ffmpeg -i input.mp4 -vf "subtitles=subtitles.srt" -c:a copy output_subtitled.mp4
+```
+
+## If You Have a `.vtt` File
+```bash
+ffmpeg -i input.mp4 -vf "subtitles=subtitles.vtt" -c:a copy output_subtitled.mp4
+```
+
+## If Encoding Issues Occur (Convert `.vtt` → `.srt` First)
+```bash
+ffmpeg -i subtitles.vtt subtitles.srt
+ffmpeg -i input.mp4 -vf "subtitles=subtitles.srt" -c:a copy output_subtitled.mp4
+```
+
+##  Command Breakdown
+
+- `-i input.mp4` → Input video file
+- `-vf "subtitles=..."` → Applies subtitle video filter
+- `-c:a copy` → Copies original audio without re-encoding
+- `output_subtitled.mp4` → Final video with embedded subtitles
+---
 ## Manual Development Setup (Optional)
 
 ### Requirements
