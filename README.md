@@ -86,7 +86,6 @@ Access:
 The system runs entirely locally within Docker containers.
 
 ---
----
 #  Permanent Subtitle Embedding (Hard Burn)
 
 You can permanently embed subtitles into an `.mp4` video using FFmpeg. Hard-burned subtitles become part of the video frames and cannot be disabled.
