@@ -1,8 +1,9 @@
 # Neural Speech-to-Text Platform
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)]()
-[![Docker](https://img.shields.io/badge/container-Docker-blue.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/container-Docker-blue.svg)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 A containerized automatic speech recognition (ASR) platform implementing end-to-end neural transcription using OpenAI’s Whisper model. The system processes YouTube URLs and local media files, generates synchronized subtitle outputs, and provides optional hard-coded subtitle rendering through FFmpeg.
 
