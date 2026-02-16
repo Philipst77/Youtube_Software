@@ -1,4 +1,5 @@
 import os
+import traceback
 import tempfile
 import shutil
 import subprocess
@@ -83,7 +84,8 @@ def download_audio(youtube_url: str, out_dir: str) -> str:
             }
         ],
         "noplaylist": True,
-        "quiet": True,
+        "quiet": False,
+
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
@@ -167,7 +169,7 @@ def transcribe_youtube():
                 "language": target_lang,
             }
         )
-
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
@@ -214,6 +216,7 @@ def transcribe_file():
         )
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
